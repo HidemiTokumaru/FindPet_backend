@@ -31,7 +31,9 @@ class Usuario(db.Model):
 
 with app.app_context():
     db.create_all()
-
+    
+# Diccionario en memoria para almacenar los usuarios
+usuarios_dict = {}
 
 @app.route('/User', methods=["GET", "POST"])
 def createUser():
@@ -40,10 +42,16 @@ def createUser():
         newUser = Usuario(username=data["username"], password=data["password"], email=data["email"])
         db.session.add(newUser)
         db.session.commit()
+
+        # Agregar el nuevo usuario al diccionario
+        usuarios_dict[newUser.IdUser] = newUser
+
         return "SUCCESS"
+
     if request.method == "GET":
-        usuario = Usuario.query.all()
-        return jsonify(usuario)
+        # Consultar el diccionario para obtener los usuarios
+        usuarios = list(usuarios_dict.values())
+        return jsonify(usuarios)
 
 
 @dataclass
